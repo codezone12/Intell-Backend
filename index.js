@@ -9,6 +9,13 @@ mongoose.set('strictQuery',false);
 
 const app = express();
 
+//cors
+app.use(cors({
+  origin:"*",
+  methods:"GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials:true, //allow session cookie from browser to pass through
+}))
+
 app.use(json());
 app.use(cors());
 
