@@ -17,7 +17,6 @@ app.use(cors({
 }))
 
 app.use(json());
-app.use(cors());
 
 sendEmailToExpiredToBePackageHolders.start();
 // app.use(passport.initialize())

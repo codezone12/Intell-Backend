@@ -297,6 +297,7 @@ export const purchasePlanById = async (req, res) => {
     } = req.body;
 
     let dbUser = await User.findById(user_id);
+    console.log("Test1");
     if (!dbUser) return badRequest(res, "Invalid Request");
 
     const currentDateAndTime = new Date();
@@ -307,7 +308,9 @@ export const purchasePlanById = async (req, res) => {
     dbUser.purchased_plan = plan_id;
     dbUser.purchased_at = currentDateAndTime;
     dbUser.package_expired_at = expires_at;
-
+    
+    console.log("Test2");
+ 
     const emailMessageUser = `Dear ${dbUser.name},\n
     Thank you for buying the ${
       ALL_PACKAGES[plan_id].type
@@ -338,11 +341,11 @@ export const purchasePlanById = async (req, res) => {
       subject: "Pakage Purchased",
       text: emailMessageAdmin
     };
-
+    
     const adminEmail = sendEmail(emailContentAdmin);
     const userEmail = sendEmail(emailContentUser);
     await Promise.all([userEmail, adminEmail]);
-
+   
     await dbUser.save();
     return successRequest(res, 200, "Plan purchased successfully");
   } catch (err) {
