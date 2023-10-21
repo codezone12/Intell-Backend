@@ -11,8 +11,8 @@ const app = express();
 
 //cors
 app.use(cors({
-  origin: ["https://intel-signals.vercel.app", "*"],
   credentials: true, //allow session cookie from browser to pass through
+  origin: ["https://intel-signals.vercel.app"],
 }))
 
 app.use(json());
