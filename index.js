@@ -5,15 +5,14 @@ import cors from "cors";
 import passport from "passport";
 import sendEmailToExpiredToBePackageHolders from "./utils/cron-ping.js";
 import mongoose from "mongoose";
-mongoose.set('strictQuery',false);
+mongoose.set('strictQuery', false);
 
 const app = express();
 
 //cors
 app.use(cors({
-  origin:"*",
-  methods:"GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials:true, //allow session cookie from browser to pass through
+  origin: ["https://intel-signals.vercel.app", "*"],
+  credentials: true, //allow session cookie from browser to pass through
 }))
 
 app.use(json());
@@ -30,12 +29,12 @@ app.use("/api", router);
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
-.then (()=>{
+  .then(() => {
     //listen for requests
-    app.listen(process.env.PORT,()=>{
-    console.log(`Connected and Listening on port ${process.env.PORT}`);
+    app.listen(process.env.PORT, () => {
+      console.log(`Connected and Listening on port ${process.env.PORT}`);
     })
-})
-.catch((err)=>{console.log(err)})
+  })
+  .catch((err) => { console.log(err) })
 
 
