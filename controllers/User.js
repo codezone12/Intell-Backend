@@ -311,40 +311,40 @@ export const purchasePlanById = async (req, res) => {
     
     console.log("Test2");
  
-    const emailMessageUser = `Dear ${dbUser.name},\n
-    Thank you for buying the ${
-      ALL_PACKAGES[plan_id].type
-    } package. This package will give you ${
-      ALL_PACKAGES[plan_id].numOfSignals ?? "Unlimited"
-    } signals and will last for ${ALL_PACKAGES[plan_id].numOfDays} days.\n
-    Have a great day. Have a great day\n
-    Regards,\n
-    IntellSignals\n
-    intellsignals.entertainment@gmail.com\n`;
+    // const emailMessageUser = `Dear ${dbUser.name},\n
+    // Thank you for buying the ${
+    //   ALL_PACKAGES[plan_id].type
+    // } package. This package will give you ${
+    //   ALL_PACKAGES[plan_id].numOfSignals ?? "Unlimited"
+    // } signals and will last for ${ALL_PACKAGES[plan_id].numOfDays} days.\n
+    // Have a great day. Have a great day\n
+    // Regards,\n
+    // IntellSignals\n
+    // intellsignals.entertainment@gmail.com\n`;
 
-    const emailMessageAdmin = `Hello,\n
-    There is an user ${dbUser.name} buy the ${
-      ALL_PACKAGES[plan_id].type
-    } package at ${new Date().toLocaleString()}.\n
-    Thank you.\n
-    Have a great day.`;
+    // const emailMessageAdmin = `Hello,\n
+    // There is an user ${dbUser.name} buy the ${
+    //   ALL_PACKAGES[plan_id].type
+    // } package at ${new Date().toLocaleString()}.\n
+    // Thank you.\n
+    // Have a great day.`;
 
-    const emailContentUser = {
-      from: "Intell-Signal",
-      to: dbUser.email,
-      subject: "Pacakge Purchased",
-      text: emailMessageUser
-    };
-    const emailContentAdmin = {
-      from: "Intell-Signal",
-      to: process.env.INSIG_EMAIL,
-      subject: "Pakage Purchased",
-      text: emailMessageAdmin
-    };
+    // const emailContentUser = {
+    //   from: "Intell-Signal",
+    //   to: dbUser.email,
+    //   subject: "Pacakge Purchased",
+    //   text: emailMessageUser
+    // };
+    // const emailContentAdmin = {
+    //   from: "Intell-Signal",
+    //   to: process.env.INSIG_EMAIL,
+    //   subject: "Pakage Purchased",
+    //   text: emailMessageAdmin
+    // };
     
-    const adminEmail = sendEmail(emailContentAdmin);
-    const userEmail = sendEmail(emailContentUser);
-    await Promise.all([userEmail, adminEmail]);
+    // const adminEmail = sendEmail(emailContentAdmin);
+    // const userEmail = sendEmail(emailContentUser);
+    // await Promise.all([userEmail, adminEmail]);
    
     await dbUser.save();
     return successRequest(res, 200, "Plan purchased successfully");
