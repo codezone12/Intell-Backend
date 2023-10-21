@@ -9,13 +9,13 @@ mongoose.set('strictQuery', false);
 
 const app = express();
 
+app.use(json());
+
 //cors
 app.use(cors({
   credentials: true, //allow session cookie from browser to pass through
-  origin: ["https://intel-signals.vercel.app"],
+  origin: ["https://intel-signals.vercel.app" , "*"],
 }))
-
-app.use(json());
 
 sendEmailToExpiredToBePackageHolders.start();
 // app.use(passport.initialize())
@@ -23,6 +23,12 @@ sendEmailToExpiredToBePackageHolders.start();
 
 app.get("/", (req, res) => {
   res.send("Application is live");
+});
+
+app.get("/test", (req, res) => {
+  res.json({
+    messgae : 'Working'
+  });
 });
 
 app.use("/api", router);
