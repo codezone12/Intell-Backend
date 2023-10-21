@@ -1,5 +1,5 @@
 import { dataFromToken } from "../helpers/token.js";
-import { unAuthorized } from "../utils/responses.js";
+import { badRequest, unAuthorized } from "../utils/responses.js";
 
 export const validateUserLoggedIn = async (req, res, next) => {
   try {
