@@ -77,7 +77,6 @@ router.put(
 );
 router.put(
   PURCHASE_PLAN,
-  validateUserLoggedIn,
   (req, res, next) => validateSchema(req, res, next, purchasePlanValidations),
   purchasePlanById
 );

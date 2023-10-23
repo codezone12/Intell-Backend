@@ -20,10 +20,28 @@ import { generateOTP } from "../utils/index.js";
 
 export const signIn = async (req, res) => {
   try {
-    const { email, name, password } = req.body;
+    const { email, name, password, walletAddress } = req.body;
 
     let user = await User.findOne({ email, name });
     if (!user) return unAuthorized(res);
+
+    if (walletAddress) {
+      let userAlreadyPresent = await User.findOne({ email, walletAddress });
+      if (!userAlreadyPresent) {
+        const walletUser = await User.findOne({ walletAddress });
+        if (walletUser) {
+          await User.findByIdAndUpdate(user._id, {
+            $set: {
+              walletAddress,
+              purchased_plan: walletUser.purchased_plan,
+              purchased_at: walletUser.purchased_at
+            }
+          })
+          await User.findByIdAndDelete(walletUser._id)
+        }
+
+      }
+    }
 
     let password_matched = await checkIfPasswordMatched(
       password.toString(),
@@ -65,7 +83,7 @@ export const signIn = async (req, res) => {
 
 export const signUp = async (req, res) => {
   try {
-    const { name, email, password, user_type } = req.body;
+    const { name, email, password, user_type, walletAddress } = req.body;
     let dbUser = await User.findOne({ $or: [{ email }, { name }] });
     if (dbUser) {
       const isSameName = name === dbUser.name;
@@ -74,13 +92,25 @@ export const signUp = async (req, res) => {
       if (isSameName) return badRequest(res, "Name already exist");
     }
     const OTP = generateOTP();
-    const newUser = await User.create({
-      name,
-      email,
-      otp: OTP,
-      user_type: USER_TYPES[user_type],
-      password: getHashedAndSaltedPassword(password)
-    });
+
+    const isWalletExists = await User.findOne({ walletAddress })
+    let newUser
+    if (!isWalletExists) {
+      newUser = await User.create({
+        name,
+        email,
+        otp: OTP,
+        user_type: USER_TYPES[user_type],
+        password: getHashedAndSaltedPassword(password),
+        walletAddress
+      });
+    } else {
+      isWalletExists.name = name
+      isWalletExists.email = email
+      isWalletExists.otp = OTP
+      isWalletExists.password = getHashedAndSaltedPassword(password)
+      await isWalletExists.save()
+    }
 
     const emailMessage = `Hello ${name} \n
     Thank your for approaching us!\n
@@ -92,7 +122,7 @@ export const signUp = async (req, res) => {
 
     const emailContent = {
       from: "Intell-Signal",
-      to: newUser.email,
+      to: email,
       subject: "Account Verification",
       text: emailMessage
     };
@@ -290,15 +320,19 @@ export const updateForgetPassword = async (req, res) => {
 export const purchasePlanById = async (req, res) => {
   try {
     const {
-      userData: {
-        user: { id: user_id }
-      },
+      walletAddress,
       plan_id
     } = req.body;
 
-    let dbUser = await User.findById(user_id);
+    let dbUser = await User.findOne({ walletAddress });
     console.log("Test1");
-    if (!dbUser) return badRequest(res, "Invalid Request");
+
+    if (!dbUser) {
+      dbUser = await User.create({
+        walletAddress,
+        user_type: 'User'
+      })
+    };
 
     const currentDateAndTime = new Date();
     const expires_at = new Date(currentDateAndTime);
@@ -308,44 +342,43 @@ export const purchasePlanById = async (req, res) => {
     dbUser.purchased_plan = plan_id;
     dbUser.purchased_at = currentDateAndTime;
     dbUser.package_expired_at = expires_at;
-    
+
     console.log("Test2");
- 
-    // const emailMessageUser = `Dear ${dbUser.name},\n
-    // Thank you for buying the ${
-    //   ALL_PACKAGES[plan_id].type
-    // } package. This package will give you ${
-    //   ALL_PACKAGES[plan_id].numOfSignals ?? "Unlimited"
-    // } signals and will last for ${ALL_PACKAGES[plan_id].numOfDays} days.\n
-    // Have a great day. Have a great day\n
-    // Regards,\n
-    // IntellSignals\n
-    // intellsignals.entertainment@gmail.com\n`;
 
-    // const emailMessageAdmin = `Hello,\n
-    // There is an user ${dbUser.name} buy the ${
-    //   ALL_PACKAGES[plan_id].type
-    // } package at ${new Date().toLocaleString()}.\n
-    // Thank you.\n
-    // Have a great day.`;
+    const emailMessageUser = `Dear ${dbUser.name},\n
+    Thank you for buying the ${ALL_PACKAGES[plan_id].type
+      } package. This package will give you ${ALL_PACKAGES[plan_id].numOfSignals ?? "Unlimited"
+      } signals and will last for ${ALL_PACKAGES[plan_id].numOfDays} days.\n
+    Have a great day. Have a great day\n
+    Regards,\n
+    IntellSignals\n
+    intellsignals.entertainment@gmail.com\n`;
 
-    // const emailContentUser = {
-    //   from: "Intell-Signal",
-    //   to: dbUser.email,
-    //   subject: "Pacakge Purchased",
-    //   text: emailMessageUser
-    // };
-    // const emailContentAdmin = {
-    //   from: "Intell-Signal",
-    //   to: process.env.INSIG_EMAIL,
-    //   subject: "Pakage Purchased",
-    //   text: emailMessageAdmin
-    // };
-    
+    const emailMessageAdmin = `Hello,\n
+    There is an user ${dbUser.name} buy the ${ALL_PACKAGES[plan_id].type
+      } package at ${new Date().toLocaleString()}.\n
+    Thank you.\n
+    Have a great day.`;
+
+    const emailContentUser = {
+      from: "Intell-Signal",
+      to: dbUser.email,
+      subject: "Pacakge Purchased",
+      text: emailMessageUser
+    };
+    const emailContentAdmin = {
+      from: "Intell-Signal",
+      to: 'codezone188@gmail.com',
+      subject: "Pakage Purchased",
+      text: emailMessageAdmin
+    };
+
     // const adminEmail = sendEmail(emailContentAdmin);
-    // const userEmail = sendEmail(emailContentUser);
-    // await Promise.all([userEmail, adminEmail]);
-   
+    // if (dbUser.email) {
+    //   await sendEmail(emailContentUser);
+    // }
+    // await Promise.all([adminEmail]);
+
     await dbUser.save();
     return successRequest(res, 200, "Plan purchased successfully");
   } catch (err) {

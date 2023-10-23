@@ -2,11 +2,12 @@ import { Schema, model } from "mongoose";
 import { USER_TYPES } from "../utils/constants.js";
 
 const UserSchema = new Schema({
-  name: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  name: { type: String },
+  email: { type: String },
+  password: { type: String },
   country: { type: String },
   profile_image: { type: String },
+  walletAddress: { type: String },
 
   verification_token: { type: String },
   isVerified: { type: Boolean, default: false },
