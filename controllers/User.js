@@ -321,18 +321,29 @@ export const purchasePlanById = async (req, res) => {
   try {
     const {
       walletAddress,
-      plan_id
+      plan_id,
+      userId
     } = req.body;
 
-    let dbUser = await User.findOne({ walletAddress });
-    console.log("Test1");
+    let dbUser
 
-    if (!dbUser) {
-      dbUser = await User.create({
-        walletAddress,
-        user_type: 'User'
-      })
-    };
+    if (userId) {
+      dbUser = await User.findById(userId);
+      dbUser.walletAddress = walletAddress
+      await dbUser.save()
+    } else {
+
+      await User.findOne({ walletAddress });
+      console.log("Test1");
+
+      if (!dbUser) {
+        dbUser = await User.create({
+          walletAddress,
+          user_type: 'User'
+        })
+      };
+    }
+
 
     const currentDateAndTime = new Date();
     const expires_at = new Date(currentDateAndTime);
@@ -378,7 +389,7 @@ export const purchasePlanById = async (req, res) => {
     //   const userEmail = sendEmail(emailContentUser);
     //   await Promise.all(userEmail);
     // }
-    
+
     // await Promise.all(adminEmail);
 
     await dbUser.save();
