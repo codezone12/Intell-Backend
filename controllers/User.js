@@ -333,7 +333,7 @@ export const purchasePlanById = async (req, res) => {
       await dbUser.save()
     } else {
 
-      await User.findOne({ walletAddress });
+      dbUser = await User.findOne({ walletAddress });
       console.log("Test1");
 
       if (!dbUser) {
