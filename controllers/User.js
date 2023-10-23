@@ -368,16 +368,18 @@ export const purchasePlanById = async (req, res) => {
     };
     const emailContentAdmin = {
       from: "Intell-Signal",
-      to: 'codezone188@gmail.com',
+      to: process.env.NM_EMAIL,
       subject: "Pakage Purchased",
       text: emailMessageAdmin
     };
 
-    // const adminEmail = sendEmail(emailContentAdmin);
-    // if (dbUser.email) {
-    //   await sendEmail(emailContentUser);
-    // }
-    // await Promise.all([adminEmail]);
+    const adminEmail = sendEmail(emailContentAdmin);
+    if (dbUser.email) {
+      const userEmail = sendEmail(emailContentUser);
+      await Promise.all(userEmail);
+    }
+    
+    await Promise.all(adminEmail);
 
     await dbUser.save();
     return successRequest(res, 200, "Plan purchased successfully");
