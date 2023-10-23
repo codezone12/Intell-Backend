@@ -156,8 +156,8 @@ export const verifyOTP = async (req, res) => {
       name: dbUser.name,
       user_type: USER_TYPES[dbUser.user_type],
       isVerified: dbUser.isVerified,
-      purchased_plan: null,
-      purchased_at: null,
+      purchased_plan: dbUser.purchased_plan,
+      purchased_at: dbUser.purchased_at,
       profile_image: null,
       counrty: ""
     };
