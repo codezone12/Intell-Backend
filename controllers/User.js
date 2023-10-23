@@ -373,13 +373,13 @@ export const purchasePlanById = async (req, res) => {
       text: emailMessageAdmin
     };
 
-    const adminEmail = sendEmail(emailContentAdmin);
-    if (dbUser.email) {
-      const userEmail = sendEmail(emailContentUser);
-      await Promise.all(userEmail);
-    }
+    // const adminEmail = sendEmail(emailContentAdmin);
+    // if (dbUser.email) {
+    //   const userEmail = sendEmail(emailContentUser);
+    //   await Promise.all(userEmail);
+    // }
     
-    await Promise.all(adminEmail);
+    // await Promise.all(adminEmail);
 
     await dbUser.save();
     return successRequest(res, 200, "Plan purchased successfully");
