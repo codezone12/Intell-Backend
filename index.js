@@ -14,7 +14,7 @@ app.use(json());
 //cors
 app.use(cors({
   credentials: true, //allow session cookie from browser to pass through
-  origin: ["https://intel-signals.vercel.app" , "http://localhost:3000" , "https://intel-signals-358zy7301-codezone12.vercel.app"]
+  origin: ["http://localhost:3000" , "https://intel-signals-358zy7301-codezone12.vercel.app"]
 }))
 
 sendEmailToExpiredToBePackageHolders.start();
